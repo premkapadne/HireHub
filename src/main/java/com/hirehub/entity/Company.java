@@ -61,10 +61,6 @@ public class Company extends BaseEntity {
     @Size(max = 500)
     @Column(name = "website", length = 500)
     private String website;
-
-
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Job> jobs = new ArrayList<>();
 }
 
 
