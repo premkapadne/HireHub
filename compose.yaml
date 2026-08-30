@@ -1,10 +1,14 @@
 services:
-  mysql:
-    image: 'mysql:latest'
-    environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+  dbservice:
+    image: mysql:8.0
+    container_name: hirehubdb
+
     ports:
-      - '3306'
+      - "3307:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hirehub
+
+    volumes:
+      - D:\HireHub\Database:/var/lib/mysql
