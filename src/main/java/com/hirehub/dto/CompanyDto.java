@@ -43,7 +43,9 @@ public record CompanyDto(
         @NotBlank(message = "Website can not be empty")
         String website,
 
-        Instant createdAt)
+        Instant createdAt,
+
+        List<JobDto> jobs)
 {
 
 }

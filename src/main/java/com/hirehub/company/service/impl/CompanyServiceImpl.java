@@ -2,7 +2,9 @@ package com.hirehub.company.service.impl;
 
 import com.hirehub.company.service.CompanyService;
 import com.hirehub.dto.CompanyDto;
+import com.hirehub.dto.JobDto;
 import com.hirehub.entity.Company;
+import com.hirehub.entity.Job;
 import com.hirehub.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -26,9 +28,41 @@ public class CompanyServiceImpl implements CompanyService
     }
 
     private CompanyDto transformCompanyToDto(Company company) {
+        List<JobDto> jobDtos = company.getJobs().stream()
+                .map(this::transformJobToDto)
+                .collect(Collectors.toList());
         return new CompanyDto(company.getId(), company.getName(), company.getLogo(),
                 company.getIndustry(), company.getSize(), company.getRating(),
                 company.getLocations(), company.getFounded(), company.getDescription(),
-                company.getEmployees(), company.getWebsite(),company.getCreatedAt());
+                company.getEmployees(), company.getWebsite(), company.getCreatedAt(),jobDtos);
+    }
+
+    private JobDto transformJobToDto(Job job) {
+        return new JobDto(
+                job.getId(),
+                job.getTitle(),
+                job.getCompany().getId(),
+                job.getCompany().getName(),
+                job.getCompany().getLogo(),
+                job.getLocation(),
+                job.getWorkType(),
+                job.getJobType(),
+                job.getCategory(),
+                job.getExperienceLevel(),
+                job.getSalaryMin(),
+                job.getSalaryMax(),
+                job.getSalaryCurrency(),
+                job.getSalaryPeriod(),
+                job.getDescription(),
+                job.getRequirements(),
+                job.getBenefits(),
+                job.getPostedDate(),
+                job.getApplicationDeadline(),
+                job.getApplicationsCount(),
+                job.getFeatured(),
+                job.getUrgent(),
+                job.getRemote(),
+                job.getStatus()
+        );
     }
 }
