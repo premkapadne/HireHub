@@ -10,7 +10,7 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "contacts")
-public class Contact {
+public class Contact extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
