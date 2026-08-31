@@ -10,57 +10,48 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "COMPANIES")
 @Getter
 @Setter
-@Entity
-@Table(name = "companies", schema = "jobportal")
 public class Company extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "ID", nullable = false)
     private Long id;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "name", nullable = false)
+    @Column(name = "NAME", nullable = false, unique = true)
     private String name;
 
-    @Size(max = 500)
-    @Column(name = "logo", length = 500)
+    @Column(name = "LOGO", length = 500)
     private String logo;
 
-    @Size(max = 100)
-    @NotNull
-    @Column(name = "industry", nullable = false, length = 100)
+    @Column(name = "INDUSTRY", nullable = false, length = 100)
     private String industry;
 
-    @Size(max = 50)
-    @NotNull
-    @Column(name = "size", nullable = false, length = 50)
+    @Column(name = "SIZE", nullable = false, length = 50)
     private String size;
 
-    @NotNull
-    @Column(name = "rating", nullable = false, precision = 3, scale = 2)
+    @Column(name = "RATING", nullable = false, precision = 3, scale = 2)
     private BigDecimal rating;
 
-    @Size(max = 1000)
-    @Column(name = "locations", length = 1000)
+    @Column(name = "LOCATIONS", length = 1000)
     private String locations;
 
-    @NotNull
-    @Column(name = "founded", nullable = false)
+    @Column(name = "FOUNDED", nullable = false)
     private Integer founded;
 
     @Lob
-    @Column(name = "description")
+    @Column(name = "DESCRIPTION")
     private String description;
 
-    @Column(name = "employees")
+    @Column(name = "EMPLOYEES")
     private Integer employees;
 
-    @Size(max = 500)
-    @Column(name = "website", length = 500)
+    @Column(name = "WEBSITE", length = 500)
     private String website;
+
 }
 
 
