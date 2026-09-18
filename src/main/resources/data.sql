@@ -60,7 +60,6 @@ INSERT INTO companies (name, logo, industry, size, rating, locations, founded, d
 INSERT INTO companies (name, logo, industry, size, rating, locations, founded, description, employees, website, created_by) VALUES ('Figma', '/logos/figma.png', 'Technology', 'Medium', 4.7, 'San Francisco,New York,London', 2012, 'Figma is a leading technology company founded in 2012. We''re committed to innovation and creating exceptional experiences for our customers and employees.', 1000, 'https://www.figma.com', 'SYSTEM');
 
 -- Insert jobs data
-
 INSERT INTO jobs (title, company_id, location, work_type, job_type, category, experience_level,
                   salary_min, salary_max, salary_currency, salary_period, description, requirements, benefits,
                   posted_date, application_deadline, applications_count, featured, urgent, remote, status, created_by)
@@ -9060,3 +9059,14 @@ VALUES ('Operations Director', 7, 'Remote', 'Hybrid', 'Freelance',
         '["Process Improvement", "Inventory Management", "Six Sigma", "Project Management", "Operations Research"]', '["Mental Health Support", "Bonus Opportunities", "Vision Insurance", "Flexible Schedule", "Disability Insurance", "Education Assistance", "Wellness Programs"]', '2025-10-14 22:27:59',
         '2025-11-12 11:27:59', 491, 0, 0,
         1, 'ACTIVE', 'SYSTEM');
+
+
+-- Inserting Roles Data
+INSERT INTO roles (name, created_at, created_by)
+VALUES ('ROLE_JOB_SEEKER', CURRENT_TIMESTAMP, 'DBA');
+
+INSERT INTO roles (name, created_at, created_by)
+VALUES ('ROLE_EMPLOYER', CURRENT_TIMESTAMP, 'DBA');
+
+INSERT INTO roles (name, created_at, created_by)
+VALUES ('ROLE_ADMIN', CURRENT_TIMESTAMP, 'DBA');
