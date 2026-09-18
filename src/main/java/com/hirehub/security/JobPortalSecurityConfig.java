@@ -1,9 +1,11 @@
 package com.hirehub.security;
 
+import com.hirehub.security.filter.JwtTokenValidatorFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -36,6 +40,8 @@ public class JobPortalSecurityConfig
     @Qualifier("securedPaths")
     private final List<String> securedPaths;
 
+    private final Environment environment;
+
     @Bean
     SecurityFilterChain customSecurityFilterChain(HttpSecurity http) {
         return http.csrf(csrfConfig -> csrfConfig.disable())
@@ -45,7 +51,8 @@ public class JobPortalSecurityConfig
                     securedPaths.forEach(path -> requests.requestMatchers(path).authenticated());
                     requests.anyRequest().denyAll();
                 })
-                .formLogin(flc -> flc.disable() )
+                .addFilterBefore(new JwtTokenValidatorFilter(publicPaths), BasicAuthenticationFilter.class)
+                .formLogin(flc -> flc.disable())
                 .httpBasic(withDefaults())
                 .build();
     }
@@ -93,9 +100,9 @@ public class JobPortalSecurityConfig
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        var autheticationProvider = new DaoAuthenticationProvider(userDetailsService());
-        autheticationProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(autheticationProvider);
+        var authenticationProvider = new DaoAuthenticationProvider(userDetailsService());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(authenticationProvider);
     }
 
 }
