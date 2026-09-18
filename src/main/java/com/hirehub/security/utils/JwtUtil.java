@@ -26,7 +26,7 @@ public class JwtUtil {
                 ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
         SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         var fetchedUser = (User) authentication.getPrincipal();
-        jwtToken = Jwts.builder().issuer("Job Portal").subject("JWT Token")
+        jwtToken = Jwts.builder().issuer("HireHub").subject("JWT Token")
                 .claim("username", fetchedUser.getUsername())
                 .claim("roles", authentication.getAuthorities().stream().map(
                         GrantedAuthority::getAuthority).collect(Collectors.joining(",")))

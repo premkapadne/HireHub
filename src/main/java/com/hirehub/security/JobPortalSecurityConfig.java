@@ -72,9 +72,21 @@ public class JobPortalSecurityConfig
     @Bean
     public UserDetailsService userDetailsService()
     {
-        var user1 = User.builder().username("Prem").password("$2a$10$nShnN/hInVkdlBomK6wSee4HqXSWTyPvnks6w18QFWR5/YIhdhT1m").build();
-        var user2 = User.builder().username("Disha").password("$2a$10$ua5XBm9TrXyG1F8vKnUP0OlG9xE6ioaJ2zeN8Y8UQVdo/yjOYm1bK").build();
-        var user3 = User.builder().username("Admin").password("$2a$10$Vlc2zDu0YB2tbAuzpotC9OWjQaO7XwL5IrzrkG9vNhZH64Z0S/XAS").build();
+        var user1 = User.builder()
+                .username("Prem")
+                .roles("USER")
+                .password("$2a$10$nShnN/hInVkdlBomK6wSee4HqXSWTyPvnks6w18QFWR5/YIhdhT1m") // @Prem123
+                .build();
+        var user2 = User.builder()
+                .username("Disha")
+                .roles("EMPLOYEE")
+                .password("$2a$10$ua5XBm9TrXyG1F8vKnUP0OlG9xE6ioaJ2zeN8Y8UQVdo/yjOYm1bK") // @Disha123
+                .build();
+        var user3 = User.builder()
+                .username("Admin")
+                .roles("ADMIN")
+                .password("$2a$10$Vlc2zDu0YB2tbAuzpotC9OWjQaO7XwL5IrzrkG9vNhZH64Z0S/XAS") // @Admin123
+                .build();
 
         return new InMemoryUserDetailsManager(user1, user2, user3);
     }
