@@ -33,23 +33,27 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController
-{
+public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil ;
-    private final RoleRepository roleRepository;
+    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final HireHubUserRepository hireHubUserRepository;
+    private final RoleRepository roleRepository;
     private final CompromisedPasswordChecker compromisedPasswordChecker;
 
-    @PostMapping(path = "/login/public", version = "1.0")
-    public ResponseEntity<LoginResponseDto> apilogin(@RequestBody LoginRequestDto loginRequestDto) {
+    @PostMapping(value = "/login/public",version = "1.0")
+    public ResponseEntity<LoginResponseDto> apiLogin(@RequestBody LoginRequestDto loginRequestDto) {
         try {
-            var resultAuthentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.username(), loginRequestDto.password()));
+            var resultAuthentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.username(),
+                    loginRequestDto.password()));
+            // Generate JWT token
             String jwtToken = jwtUtil.generateJwtToken(resultAuthentication);
             var userDto = new UserDto();
+            var loggedInUser = (HireHubUser) resultAuthentication.getPrincipal();
+            BeanUtils.copyProperties(loggedInUser, userDto);
+            userDto.setRole(loggedInUser.getRole().getName());
+            userDto.setUserId(loggedInUser.getId());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new LoginResponseDto(HttpStatus.OK.getReasonPhrase(),
                             userDto, jwtToken));
@@ -63,12 +67,11 @@ public class AuthController
             return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                     "An unexpected error occurred");
         }
+
     }
 
     @PostMapping(value = "/register/public",version = "1.0")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequestDto registerRequestDto)
-    {
-        // Checking if the password is being compromised or not.
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequestDto registerRequestDto) {
         CompromisedPasswordDecision decision = compromisedPasswordChecker
                 .check(registerRequestDto.password());
         if (decision.isCompromised()) {
@@ -76,7 +79,6 @@ public class AuthController
                     .status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("password", "Choose a strong password"));
         }
-
         Optional<HireHubUser> existingUser = hireHubUserRepository.readUserByEmailOrMobileNumber
                 (registerRequestDto.email(), registerRequestDto.mobileNumber());
         if (existingUser.isPresent()) {
@@ -90,22 +92,22 @@ public class AuthController
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
-        HireHubUser hireHubUser = new HireHubUser();
-        BeanUtils.copyProperties(registerRequestDto, hireHubUser);
-        hireHubUser.setPasswordHash(passwordEncoder.encode(registerRequestDto.password()));
+        HireHubUser jobPortalUser = new HireHubUser();
+        BeanUtils.copyProperties(registerRequestDto, jobPortalUser);
+        jobPortalUser.setPasswordHash(passwordEncoder.encode(registerRequestDto.password()));
         Role role = roleRepository.findRoleByName(ApplicationConstants.ROLE_JOB_SEEKER)
                 .orElseThrow(() -> new IllegalArgumentException("Role not found: " +
                         ApplicationConstants.ROLE_JOB_SEEKER));
-        hireHubUser.setRole(role);
-        hireHubUserRepository.save(hireHubUser);
+        jobPortalUser.setRole(role);
+        hireHubUserRepository.save(jobPortalUser);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
-    private ResponseEntity<LoginResponseDto> buildErrorResponse(HttpStatus status, String message)
-    {
+    private ResponseEntity<LoginResponseDto> buildErrorResponse(HttpStatus status,
+                                                                String message) {
         return ResponseEntity
                 .status(status)
                 .body(new LoginResponseDto(message, null, null));
     }
-}
 
+}

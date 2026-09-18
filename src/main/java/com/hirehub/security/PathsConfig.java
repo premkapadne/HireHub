@@ -28,8 +28,7 @@ public class PathsConfig {
     @Bean(name = "securedPaths")
     public List<String> securedPaths() {
         return List.of(
-                "/api/**",
-                "/api/companies/public"
+                "/api/**"
         );
     }
 

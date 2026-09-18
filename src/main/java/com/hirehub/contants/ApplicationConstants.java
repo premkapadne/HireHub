@@ -11,5 +11,7 @@ public class ApplicationConstants {
     public static final String JWT_HEADER = "Authorization";
 
     public static final String ROLE_JOB_SEEKER = "ROLE_JOB_SEEKER";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String ROLE_EMPLOYER = "ROLE_EMPLOYER";
 
 }
