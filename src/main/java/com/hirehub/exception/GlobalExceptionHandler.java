@@ -60,4 +60,12 @@ public class GlobalExceptionHandler
                 "A NullPointerException occurred due to : "+exception.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(RegistrationValidationException.class)
+    public ResponseEntity<Map<String, String>> handleRegistrationException(
+            RegistrationValidationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getErrors());
+    }
 }
