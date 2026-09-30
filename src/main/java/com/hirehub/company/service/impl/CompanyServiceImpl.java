@@ -1,6 +1,7 @@
 package com.hirehub.company.service.impl;
 
 import com.hirehub.company.service.CompanyService;
+import com.hirehub.contants.ApplicationConstants;
 import com.hirehub.dto.CompanyDto;
 import com.hirehub.dto.JobDto;
 import com.hirehub.entity.Company;
@@ -23,7 +24,7 @@ public class CompanyServiceImpl implements CompanyService
     @Override
     public List<CompanyDto> getAllCompanies()
     {
-        List<Company> companyList = companyRepository.findAll();
+        List<Company> companyList = companyRepository.fetchCompaniesWithJobsByStatus(ApplicationConstants.ACTIVE_STATUS);
         return companyList.stream().map(this::transformCompanyToDto).collect(Collectors.toList());
     }
 
