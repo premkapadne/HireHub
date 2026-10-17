@@ -8,6 +8,9 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -46,6 +49,18 @@ public class HireHubUser extends BaseEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "company_id")
     private Company company;
+
+    @OneToOne(mappedBy = "user")
+    private Profile profile;
+
+    @ManyToMany
+    @JoinTable(name = "saved_jobs",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "job_id")})
+    private Set<Job> savedJobs = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<JobApplication> jobApplications = new LinkedHashSet<>();
 
 
 }

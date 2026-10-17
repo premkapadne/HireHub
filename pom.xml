@@ -129,6 +129,18 @@
             <optional>true</optional>
         </dependency>
 
+        <!--        Caching Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <!--        Caffeine Cache Provider Dependencies -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!--        Testing Related Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
