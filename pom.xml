@@ -141,6 +141,25 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <!--        Actuator Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!--        OpenTelemetry Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-opentelemetry</artifactId>
+        </dependency>
+
+        <!--        Log Appender Dependencies -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+            <version>2.24.0-alpha</version>
+        </dependency>
+
         <!--        Testing Related Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -165,6 +184,7 @@
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>

@@ -21,7 +21,8 @@ public class CompanyController {
     @GetMapping(path = "/public",version = "1.0")
     public ResponseEntity<List<CompanyDto>> getAllCompanies() {
         List<CompanyDto> companyList = companyService.getAllCompanies();
-        return ResponseEntity.ok().body(companyList);
+          throw new RuntimeException("This is Custom Exception for Demo Purpose !!!");
+//        return ResponseEntity.ok().body(companyList);
     }
 
     @PostMapping(path = "/admin", version = "1.0")
