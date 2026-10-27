@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,6 +49,7 @@ public class ContactController {
 //    }
 
     @GetMapping("/page/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ContactResponseDto>> fetchNewContactMsgsWithPaginationAndSort(
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize,
@@ -59,6 +61,7 @@ public class ContactController {
     }
 
     @PatchMapping("/{id}/status/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> closeContactMsg(@PathVariable String id) {
         boolean isUpdated = contactService.closeContactMsg(Long.valueOf(id),
                 ApplicationConstants.CLOSED_MESSAGE);

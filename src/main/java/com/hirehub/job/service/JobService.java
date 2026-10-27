@@ -38,7 +38,7 @@ public interface JobService {
      * @param jobId the ID of the job for which applications need to be retrieved
      * @return a list of job applications submitted for the specified job
      */
-    List<JobApplicationDto> getApplicationsByJobForEmployer(Long jobId);
+    List<JobApplicationDto> getApplicationsByJobForEmployer(Long jobId, String employerEmail);
 
     /**
      * Updates an existing job application with the provided details.
@@ -46,8 +46,8 @@ public interface JobService {
      * @param updateJobApplicationDto the data transfer object containing
      *                                the details to update the job application,
      *                                such as the application ID, status, and notes.
-     * @return true if the job application was successfully updated; false otherwise.
+     * @param employerEmail the email of the employer making the request
      */
-    boolean updateJobApplication(UpdateJobApplicationDto updateJobApplicationDto);
+    void updateJobApplication(UpdateJobApplicationDto updateJobApplicationDto, String employerEmail);
 
 }

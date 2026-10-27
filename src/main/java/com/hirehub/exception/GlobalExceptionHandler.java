@@ -6,6 +6,8 @@ import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,6 +27,45 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     private final Tracer tracer;
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(
+            ResourceNotFoundException exception, WebRequest webRequest) {
+        TraceContext context = tracer.currentTraceContext().context();
+        String traceId = context != null ? context.traceId() : "";
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
+                webRequest.getDescription(false), HttpStatus.NOT_FOUND,
+                exception.getMessage(), LocalDateTime.now(), traceId);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(
+            AccessDeniedException exception, WebRequest webRequest) {
+        TraceContext context = tracer.currentTraceContext().context();
+        String traceId = "";
+        if (context != null) {
+            traceId = context.traceId();
+        }
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
+                webRequest.getDescription(false), HttpStatus.FORBIDDEN,
+                "Access denied", LocalDateTime.now(), traceId);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponseDto> handleAuthenticationException(
+            AuthenticationException exception, WebRequest webRequest) {
+        TraceContext context = tracer.currentTraceContext().context();
+        String traceId = "";
+        if (context != null) {
+            traceId = context.traceId();
+        }
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
+                webRequest.getDescription(false), HttpStatus.UNAUTHORIZED,
+                "Authentication required", LocalDateTime.now(), traceId);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception exception, WebRequest webRequest) {

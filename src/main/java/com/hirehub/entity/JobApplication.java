@@ -16,7 +16,9 @@ import java.time.Instant;
 @NamedQueries({
         @NamedQuery(name= "JobApplication.updateStatusAndNotesById",
                 query = "UPDATE JobApplication j SET j.status = :status, j.notes = :notes, " +
-                        " j.updatedAt = CURRENT_TIMESTAMP, j.updatedBy = :updatedBy WHERE j.id = :id")
+                        " j.updatedAt = CURRENT_TIMESTAMP, j.updatedBy = :updatedBy " +
+                        "WHERE j.id = :id AND j.job.id IN " +
+                        "(SELECT jb.id FROM Job jb WHERE jb.company.id = :companyId)")
 })
 @Entity
 @Table(name = "job_applications")

@@ -1,23 +1,21 @@
 package com.hirehub.security;
 
 import com.hirehub.security.filter.JwtTokenValidatorFilter;
+import com.hirehub.security.utils.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -35,22 +33,14 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class JobPortalSecurityConfig
 {
     @Qualifier("publicPaths")
     private final List<String> publicPaths;
 
-    @Qualifier("securedPaths")
-    private final List<String> securedPaths;
-
-    @Qualifier("adminPaths")
-    private final List<String> adminPaths;
-
-    @Qualifier("employerPaths")
-    private final List<String> employerPaths;
-
-    private final Environment environment;
+    private final JwtService jwtService;
 
     @Bean
     SecurityFilterChain customSecurityFilterChain(HttpSecurity http) {
@@ -61,12 +51,11 @@ public class JobPortalSecurityConfig
                 .cors(corsConfig -> corsConfig.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(requests -> {
                     publicPaths.forEach(path -> requests.requestMatchers(path).permitAll());
-                    adminPaths.forEach(path -> requests.requestMatchers(path).hasRole("ADMIN"));
-                    employerPaths.forEach(path -> requests.requestMatchers(path).hasRole("EMPLOYER"));
-                    securedPaths.forEach(path -> requests.requestMatchers(path).authenticated());
+                    requests.requestMatchers("/jobportal/actuator/**").hasRole("ADMIN");
+                    requests.requestMatchers("/api/**").authenticated();
                     requests.anyRequest().denyAll();
                 })
-                .addFilterBefore(new JwtTokenValidatorFilter(publicPaths), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtTokenValidatorFilter(publicPaths, jwtService), BasicAuthenticationFilter.class)
                 .formLogin(flc -> flc.disable())
                 .httpBasic(hbc -> hbc.disable())
                 .exceptionHandling(exception -> exception
@@ -75,11 +64,11 @@ public class JobPortalSecurityConfig
                                     response.setContentType("application/json");
                                     response.getWriter().write("{\"error\": \"Access Denied\", \"message\": \"You don't have permission to access this resource\"}");
                                 })
-//                        .authenticationEntryPoint((request, response, authException) -> {
-//                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//                            response.setContentType("application/json");
-//                            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Authentication required\"}");
-//                        })
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
+                        })
 
                 )
                 .build();
@@ -98,30 +87,6 @@ public class JobPortalSecurityConfig
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-/*  Just for Testing Purpose :-
-    @Bean
-    public UserDetailsService userDetailsService()
-    {
-        var user1 = User.builder()
-                .username("Prem")
-                .roles("USER")
-                .password("$2a$10$nShnN/hInVkdlBomK6wSee4HqXSWTyPvnks6w18QFWR5/YIhdhT1m") // @Prem123
-                .build();
-        var user2 = User.builder()
-                .username("Disha")
-                .roles("EMPLOYEE")
-                .password("$2a$10$ua5XBm9TrXyG1F8vKnUP0OlG9xE6ioaJ2zeN8Y8UQVdo/yjOYm1bK") // @Disha123
-                .build();
-        var user3 = User.builder()
-                .username("Admin")
-                .roles("ADMIN")
-                .password("$2a$10$Vlc2zDu0YB2tbAuzpotC9OWjQaO7XwL5IrzrkG9vNhZH64Z0S/XAS") // @Admin123
-                .build();
-
-        return new InMemoryUserDetailsManager(user1, user2, user3);
-    }
-*/
 
     @Bean
     public PasswordEncoder passwordEncoder()

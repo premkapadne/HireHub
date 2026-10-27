@@ -6,6 +6,7 @@ import com.hirehub.dto.UpdateJobApplicationDto;
 import com.hirehub.entity.HireHubUser;
 import com.hirehub.entity.Job;
 import com.hirehub.entity.JobApplication;
+import com.hirehub.exception.ResourceNotFoundException;
 import com.hirehub.job.service.JobService;
 import com.hirehub.repository.HireHubUserRepository;
 import com.hirehub.repository.JobApplicationRepository;
@@ -82,8 +83,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobApplicationDto> getApplicationsByJobForEmployer(Long jobId) {
-        List<JobApplication> applications = jobApplicationRepository.findByJobIdOrderByAppliedAtAsc(jobId);
+    public List<JobApplicationDto> getApplicationsByJobForEmployer(Long jobId, String employerEmail) {
+        Long companyId = getEmployerCompanyId(employerEmail);
+        if (!jobRepository.existsByIdAndCompanyId(jobId, companyId)) {
+            throw new ResourceNotFoundException("Job not found");
+        }
+        List<JobApplication> applications = jobApplicationRepository
+                .findByJobIdAndJobCompanyIdOrderByAppliedAtAsc(jobId, companyId);
         return applications.stream()
                 .map(jobApplication -> ApplicationUtility.mapToJobApplicationDto(jobApplication))
                 .collect(Collectors.toList());
@@ -91,10 +97,23 @@ public class JobServiceImpl implements JobService {
 
     @Transactional
     @Override
-    public boolean updateJobApplication(UpdateJobApplicationDto dto) {
+    public void updateJobApplication(UpdateJobApplicationDto dto, String employerEmail) {
+        Long companyId = getEmployerCompanyId(employerEmail);
         int updatedRows = jobApplicationRepository.updateStatusAndNotesById(
-                dto.status().name(), dto.notes(),dto.applicationId(), ApplicationUtility.getLoggedInUser());
-        return updatedRows > 0;
+                dto.status().name(), dto.notes(), dto.applicationId(),
+                ApplicationUtility.getLoggedInUser(), companyId);
+        if (updatedRows == 0) {
+            throw new ResourceNotFoundException("Application not found");
+        }
+    }
+
+    private Long getEmployerCompanyId(String employerEmail) {
+        HireHubUser employer = userRepository.findHireHubUserByEmail(employerEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Employer not found"));
+        if (employer.getCompany() == null) {
+            throw new ResourceNotFoundException("Employer does not have a company assigned");
+        }
+        return employer.getCompany().getId();
     }
 
     private Job tranformDtoToEntity(JobDto jobDto) {

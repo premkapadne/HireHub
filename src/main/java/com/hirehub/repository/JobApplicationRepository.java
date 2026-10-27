@@ -20,7 +20,10 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
     // Find applications by job ID
     List<JobApplication> findByJobIdOrderByAppliedAtAsc(Long jobId);
 
+    List<JobApplication> findByJobIdAndJobCompanyIdOrderByAppliedAtAsc(Long jobId, Long companyId);
+
     @Modifying
     int updateStatusAndNotesById(@Param("status") String status, @Param("notes") String notes,
-                                 @Param("id") Long id, @Param("updatedBy") String updatedBy);
+                                 @Param("id") Long id, @Param("updatedBy") String updatedBy,
+                                 @Param("companyId") Long companyId);
 }

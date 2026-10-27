@@ -4,14 +4,22 @@ services:
     container_name: hirehubdb
 
     ports:
-      - "3407:3306"
+      - "3308:3306"
 
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hirehub
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME:-hirehub}
+      MYSQL_USER: ${DATABASE_USERNAME}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
 
     volumes:
       - D:\HireHub\Database:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   grafana-lgtm:
     image: 'grafana/otel-lgtm:latest'
@@ -19,3 +27,4 @@ services:
       - '3000:3000'
       - '4317:4317'
       - '4318:4318'
+

@@ -9,7 +9,7 @@ import com.hirehub.entity.HireHubUser;
 import com.hirehub.entity.Role;
 import com.hirehub.repository.HireHubUserRepository;
 import com.hirehub.repository.RoleRepository;
-import com.hirehub.security.utils.JwtUtil;
+import com.hirehub.security.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -36,7 +36,7 @@ import java.util.Optional;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final HireHubUserRepository hireHubUserRepository;
     private final RoleRepository roleRepository;
@@ -48,7 +48,7 @@ public class AuthController {
             var resultAuthentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.username(),
                     loginRequestDto.password()));
             // Generate JWT token
-            String jwtToken = jwtUtil.generateJwtToken(resultAuthentication);
+            String jwtToken = jwtService.generateToken(resultAuthentication);
             var userDto = new UserDto();
             var loggedInUser = (HireHubUser) resultAuthentication.getPrincipal();
             BeanUtils.copyProperties(loggedInUser, userDto);

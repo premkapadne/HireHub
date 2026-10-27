@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,7 @@ public class UserController {
     private final IUserService userService;
 
     @GetMapping("/search/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> searchUserByEmail(@RequestParam String email) {
         Optional<UserDto> userOptional = userService.searchUserByEmail(email);
         if (userOptional.isEmpty()) {
@@ -36,6 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsers()
     {
         List<UserDto> userDto = userService.getAllUsers();
@@ -43,12 +46,14 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/role/employer/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> elevateToEmployer(@PathVariable Long userId) {
         UserDto updatedUser = userService.elevateToEmployer(userId);
         return ResponseEntity.ok(updatedUser);
     }
 
     @PatchMapping("/{userId}/company/{companyId}/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> assignCompanyToEmployer(
             @PathVariable Long userId, @PathVariable Long companyId) {
         UserDto updatedUser = userService.assignCompanyToEmployer(userId, companyId);
@@ -57,6 +62,7 @@ public class UserController {
 
     @PutMapping(value = "/profile/jobseeker", version = "1.0",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<ProfileDto> createOrUpdateProfile(
             @RequestPart(value = "profile") String profileJson,
             @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture,
@@ -69,6 +75,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<ProfileDto> getProfile(Authentication authentication) {
         String userEmail = authentication.getName();
         ProfileDto profileDto = userService.getProfile(userEmail);
@@ -76,6 +83,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/picture/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<byte[]> getProfilePicture(Authentication authentication) {
         String userEmail = authentication.getName();
         ProfileDto profileDto = userService.getProfilePicture(userEmail);
@@ -90,6 +98,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/resume/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<byte[]> getResume(Authentication authentication) {
         String userEmail = authentication.getName();
         ProfileDto profileDto = userService.getResume(userEmail);
@@ -105,6 +114,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/saved-jobs/{jobId}/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<JobDto> saveJob(@PathVariable Long jobId,
                                           Authentication authentication) {
         String userEmail = authentication.getName();
@@ -113,6 +123,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/saved-jobs/{jobId}/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<String> unsaveJob(@PathVariable Long jobId,
                                             Authentication authentication) {
         String userEmail = authentication.getName();
@@ -121,6 +132,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/saved-jobs/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<List<JobDto>> getSavedJobs(Authentication authentication) {
         String userEmail = authentication.getName();
         List<JobDto> savedJobDtos = userService.getSavedJobs(userEmail);
@@ -128,6 +140,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/job-applications/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<JobApplicationDto> applyForJob(
             @RequestBody @Valid ApplyJobRequestDto applyJobRequestDto, Authentication authentication) {
         String userEmail = authentication.getName();
@@ -136,6 +149,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/job-applications/{jobId}/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<String> withdrawApplication(@PathVariable Long jobId,
                                                       Authentication authentication) {
         String userEmail = authentication.getName();
@@ -144,6 +158,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/job-applications/jobseeker", version = "1.0")
+    @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<List<JobApplicationDto>> getJobSeekerApplications(Authentication authentication) {
         String userEmail = authentication.getName();
         List<JobApplicationDto> applications = userService.getJobSeekerApplications(userEmail);

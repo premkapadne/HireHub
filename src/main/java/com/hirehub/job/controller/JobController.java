@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/jobs")
+@PreAuthorize("hasRole('EMPLOYER')")
 @RequiredArgsConstructor
 public class JobController {
 
@@ -54,18 +56,17 @@ public class JobController {
 
     @GetMapping("/applications/{jobId}/employer")
     public ResponseEntity<List<JobApplicationDto>> getApplicationsByJobForEmployer(
-            @PathVariable Long jobId) {
-        List<JobApplicationDto> applications = jobService.getApplicationsByJobForEmployer(jobId);
+            @PathVariable Long jobId, Authentication authentication) {
+        List<JobApplicationDto> applications = jobService.getApplicationsByJobForEmployer(
+                jobId, authentication.getName());
         return ResponseEntity.ok(applications);
     }
 
     @PatchMapping("/applications/employer")
     public ResponseEntity<String> updateJobApplication(
-            @RequestBody @Valid UpdateJobApplicationDto updateJobApplicationDto) {
-        boolean isUpdated = jobService.updateJobApplication(updateJobApplicationDto);
-        if(!isUpdated) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update application");
-        }
+            @RequestBody @Valid UpdateJobApplicationDto updateJobApplicationDto,
+            Authentication authentication) {
+        jobService.updateJobApplication(updateJobApplicationDto, authentication.getName());
         return ResponseEntity.ok("Application updated successfully");
     }
 
