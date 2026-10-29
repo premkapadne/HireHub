@@ -1,6 +1,7 @@
 package com.hirehub.security;
 
 import com.hirehub.security.filter.JwtTokenValidatorFilter;
+import com.hirehub.security.utils.CorsProperties;
 import com.hirehub.security.utils.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,8 @@ public class JobPortalSecurityConfig
 
     private final JwtService jwtService;
 
+    private final CorsProperties corsProperties;
+
     @Bean
     SecurityFilterChain customSecurityFilterChain(HttpSecurity http) {
         return http.csrf(csrfConfig ->
@@ -77,11 +80,11 @@ public class JobPortalSecurityConfig
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        config.setAllowedMethods(Collections.singletonList("*"));
-        config.setAllowedHeaders(Collections.singletonList("*"));
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
+        config.setAllowedOrigins(corsProperties.getAllowedOrigins());
+        config.setAllowedMethods(corsProperties.getAllowedMethods());
+        config.setAllowedHeaders(corsProperties.getAllowedHeaders());
+        config.setAllowCredentials(corsProperties.getAllowCredentials());
+        config.setMaxAge(corsProperties.getMaxAge());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

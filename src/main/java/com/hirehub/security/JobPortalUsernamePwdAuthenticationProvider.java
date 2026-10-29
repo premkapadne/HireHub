@@ -4,6 +4,7 @@ import com.hirehub.entity.HireHubUser;
 import com.hirehub.repository.HireHubUserRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Profile("prod")
 @Component
 @RequiredArgsConstructor
 public class JobPortalUsernamePwdAuthenticationProvider implements AuthenticationProvider {

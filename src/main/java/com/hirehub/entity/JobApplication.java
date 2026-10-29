@@ -51,12 +51,10 @@ public class JobApplication extends BaseEntity {
     @Column(name = "status", nullable = false, length = 50)
     private String status;
 
-    @Lob
-    @Column(name = "cover_letter")
+    @Column(name = "cover_letter", columnDefinition = "LONGTEXT")
     private String coverLetter;
 
-    @Lob
-    @Column(name = "notes")
+    @Column(name = "notes", columnDefinition = "LONGTEXT")
     private String notes;
 
 

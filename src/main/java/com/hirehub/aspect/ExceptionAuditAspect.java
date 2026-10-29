@@ -6,18 +6,25 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Aspect
 @Component
 @Slf4j
 public class ExceptionAuditAspect {
 
     @AfterThrowing(
-            pointcut = "execution(public * com.hirehub..service..*.*(..))",
+            pointcut = "execution(* com.hirehub..*.*(..))",
             throwing = "ex"
     )
     public void logAfterException(JoinPoint joinPoint, Exception ex) {
-        String method = joinPoint.getSignature().toShortString();
-        log.error("{} failed with {}", method, ex.getClass().getSimpleName());
+        String methodName = joinPoint.getSignature().toShortString();
+        Object[] methodArgs = joinPoint.getArgs();
+
+        log.error("❌ Exception occurred in method: {}", methodName);
+        log.error("📥 Arguments: {}", Arrays.toString(methodArgs));
+        log.error("💥 Exception type: {}", ex.getClass().getSimpleName());
+        log.error("🧾 Exception message: {}", ex.getMessage());
     }
 
 }

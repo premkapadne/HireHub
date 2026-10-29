@@ -23,8 +23,7 @@ public class Contact extends BaseEntity {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Lob
-    @Column(name = "message", nullable = false)
+    @Column(name = "message", nullable = false, columnDefinition = "LONGTEXT")
     private String message;
 
     @Column(name = "name", nullable = false)

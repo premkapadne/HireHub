@@ -6,16 +6,26 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Aspect
 @Component
 @Slf4j
 public class LoggingAndPerformanceAspect {
 
-    @Around("execution(public * com.hirehub..service..*.*(..))")
+    // @Around("@annotation(com.hirehub.aspects.LogAspect)")
+    @Around("execution(* com.hirehub..*.*(..))")
     public Object logAndMeasureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.nanoTime();
-        String method = joinPoint.getSignature().toShortString();
-        try { return joinPoint.proceed(); }
-        finally { log.info("{} took {} ms", method, (System.nanoTime() - start) / 1_000_000); }
+        long startTime = System.currentTimeMillis();
+        String methodName = joinPoint.getSignature().toShortString();
+        Object[] methodArgs = joinPoint.getArgs();
+        log.info("➡️ Entering method: {}", methodName);
+        log.info("📥 Arguments: {}", Arrays.toString(methodArgs));
+        // Proceed with actual business method
+        Object result = joinPoint.proceed();
+        long executionTime = System.currentTimeMillis() - startTime;
+        log.info("✅ Method executed successfully: {}", methodName);
+        log.info("⏱ Execution time: {} ms", executionTime);
+        return result;
     }
 }
