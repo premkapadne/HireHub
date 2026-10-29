@@ -62,8 +62,7 @@ public class Company extends BaseEntity {
     @Column(name = "FOUNDED", nullable = false)
     private Integer founded;
 
-    @Lob
-    @Column(name = "DESCRIPTION")
+    @Column(name = "DESCRIPTION", columnDefinition = "LONGTEXT")
     private String description;
 
     @Column(name = "EMPLOYEES")

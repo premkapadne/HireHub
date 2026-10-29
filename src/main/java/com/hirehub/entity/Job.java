@@ -18,16 +18,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "jobs")
-@AttributeOverrides({
-        @AttributeOverride(name = "createdAt",
-                column = @Column(nullable = false)),
-        @AttributeOverride(name = "createdBy",
-                column = @Column(nullable = false,
-                        length = 20)),
-        @AttributeOverride(name = "updatedAt",
-                column = @Column),
-        @AttributeOverride(name = "updatedBy",
-                column = @Column(length = 20))})
 public class Job extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -91,16 +81,13 @@ public class Job extends BaseEntity {
     private String salaryPeriod;
 
     @NotNull
-    @Lob
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "LONGTEXT")
     private String description;
 
-    @Lob
-    @Column(name = "requirements")
+    @Column(name = "requirements", columnDefinition = "LONGTEXT")
     private String requirements;
 
-    @Lob
-    @Column(name = "benefits")
+    @Column(name = "benefits", columnDefinition = "LONGTEXT")
     private String benefits;
 
     @NotNull
