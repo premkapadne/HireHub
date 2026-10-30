@@ -13,7 +13,7 @@ services:
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
 
     volumes:
-      - D:\HireHub\Database:/var/lib/mysql
+      - ${DB_DATA_PATH:-./Database}:/var/lib/mysql
 
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
