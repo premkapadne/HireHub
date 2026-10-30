@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Profile("prod")
+@Profile({"prod","default"})
 @Component
 @RequiredArgsConstructor
 public class JobPortalUsernamePwdAuthenticationProvider implements AuthenticationProvider {
