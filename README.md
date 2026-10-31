@@ -241,14 +241,18 @@ Validation failures return `400` with a map of field name to message. Use the `t
 
 ## Postman collection
 
-A ready-made collection that covers every endpoint is included.
+A ready-made collection with all 31 requests is included: `docs/postman/HireHub.postman_collection.json`.
 
 | Step | What to do |
 |---|---|
 | 1 | In Postman choose **Import** and select `docs/postman/HireHub.postman_collection.json`. |
-| 2 | Start the app (see [Getting started](#getting-started)). |
-| 3 | Run **Auth → Get CSRF token**, then **Auth → Login** with a [demo user](#demo-users). |
-| 4 | Use the token in the collection's `Authorization: Bearer` header and try the endpoints for that user's role. |
+| 2 | Start the app (see [Getting started](#getting-started)). The collection's `baseUrl` variable is `http://localhost:8080`. |
+| 3 | Run **Auth → Get CSRF token**. A script saves the token in the `csrfToken` variable. |
+| 4 | Run **Auth → Login**. The body is the demo admin, and a script saves the JWT in the `jwt` variable. |
+| 5 | Run any other request. The `Authorization: Bearer` and `X-XSRF-TOKEN` headers are filled in from those variables. |
+| 6 | To try another role, change the Login body to the employer or job-seeker [demo user](#demo-users) and log in again. |
+
+IDs in the sample URLs (company, job and user IDs) depend on your database. Change them to IDs that exist in yours.
 
 ## Getting started
 
@@ -407,4 +411,6 @@ HireHub
 
 **Prem Kapadne** · [GitHub](https://github.com/premkapadne)
 
-<!-- Add LinkedIn and email here. -->
+https://www.linkedin.com/in/prem-shimpi/ 
+
+premkapadne27@gmail.com
