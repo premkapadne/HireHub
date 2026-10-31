@@ -13,6 +13,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.hirehub.dto.ErrorResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/contacts")
@@ -22,6 +28,8 @@ public class ContactController {
     private final ContactService contactService;
 
     @PostMapping(path = "/public",version = "1.0")
+    @Operation(summary = "Submit a contact message", description = "Submits a contact message using the supplied validated contact details.")
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Contact message submitted"), @ApiResponse(responseCode = "500", description = "Message submission failed or internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))})
     public ResponseEntity<String> saveContactMsg(@RequestBody @Valid ContactRequestDto contactRequestDto) {
         boolean isSaved =  contactService.saveContact(contactRequestDto);
         if (isSaved) {
@@ -49,6 +57,8 @@ public class ContactController {
 //    }
 
     @GetMapping("/page/admin")
+    @Operation(summary = "List contact messages", description = "Returns a page of contact messages sorted by the requested field and direction. Requires the ADMIN role.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Contact messages returned"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "ADMIN role required")})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ContactResponseDto>> fetchNewContactMsgsWithPaginationAndSort(
             @RequestParam(defaultValue = "0") int pageNumber,
@@ -61,6 +71,8 @@ public class ContactController {
     }
 
     @PatchMapping("/{id}/status/admin")
+    @Operation(summary = "Close a contact message", description = "Marks the contact message identified by id as closed. Requires the ADMIN role.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Contact message updated"), @ApiResponse(responseCode = "400", description = "Contact message could not be updated"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "ADMIN role required")})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> closeContactMsg(@PathVariable String id) {
         boolean isUpdated = contactService.closeContactMsg(Long.valueOf(id),

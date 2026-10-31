@@ -18,6 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/users")
@@ -27,6 +32,8 @@ public class UserController {
     private final IUserService userService;
 
     @GetMapping("/search/admin")
+    @Operation(summary = "Search for a user by email", description = "Finds a user by email address. Requires the ADMIN role.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "User found"), @ApiResponse(responseCode = "404", description = "No user found for the supplied email"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "ADMIN role required")})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> searchUserByEmail(@RequestParam String email) {
         Optional<UserDto> userOptional = userService.searchUserByEmail(email);
@@ -38,6 +45,8 @@ public class UserController {
     }
 
     @GetMapping("/admin")
+    @Operation(summary = "List users", description = "Returns all users. Requires the ADMIN role.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Users returned"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "ADMIN role required")})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsers()
     {
@@ -46,6 +55,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/role/employer/admin")
+    @Operation(summary = "Elevate user to employer", description = "Grants the employer role to the specified user. Requires the ADMIN role.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "User role updated"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "ADMIN role required")})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> elevateToEmployer(@PathVariable Long userId) {
         UserDto updatedUser = userService.elevateToEmployer(userId);
@@ -53,6 +64,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/company/{companyId}/admin")
+    @Operation(summary = "Assign company to employer", description = "Associates the specified employer user with the specified company. Requires the ADMIN role.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Company assigned to user"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "ADMIN role required")})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> assignCompanyToEmployer(
             @PathVariable Long userId, @PathVariable Long companyId) {
@@ -62,6 +75,8 @@ public class UserController {
 
     @PutMapping(value = "/profile/jobseeker", version = "1.0",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Create or update job seeker profile", description = "Creates or updates the authenticated job seeker's profile. Submit profile as JSON and optionally include profilePicture and resume files as multipart parts.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Profile saved"), @ApiResponse(responseCode = "400", description = "Invalid profile or multipart request"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<ProfileDto> createOrUpdateProfile(
             @RequestPart(value = "profile") String profileJson,
@@ -75,6 +90,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/jobseeker", version = "1.0")
+    @Operation(summary = "Get job seeker profile", description = "Returns the authenticated job seeker's profile.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Profile returned"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<ProfileDto> getProfile(Authentication authentication) {
         String userEmail = authentication.getName();
@@ -83,6 +100,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/picture/jobseeker", version = "1.0")
+    @Operation(summary = "Get profile picture", description = "Returns the authenticated job seeker's profile picture as binary content.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Profile picture returned"), @ApiResponse(responseCode = "404", description = "No profile picture is available"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<byte[]> getProfilePicture(Authentication authentication) {
         String userEmail = authentication.getName();
@@ -98,6 +117,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/profile/resume/jobseeker", version = "1.0")
+    @Operation(summary = "Download resume", description = "Downloads the authenticated job seeker's resume as an attachment.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Resume returned"), @ApiResponse(responseCode = "404", description = "No resume is available"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<byte[]> getResume(Authentication authentication) {
         String userEmail = authentication.getName();
@@ -114,6 +135,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/saved-jobs/{jobId}/jobseeker", version = "1.0")
+    @Operation(summary = "Save a job", description = "Saves the specified job for the authenticated job seeker.")
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Job saved"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<JobDto> saveJob(@PathVariable Long jobId,
                                           Authentication authentication) {
@@ -123,6 +146,8 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/saved-jobs/{jobId}/jobseeker", version = "1.0")
+    @Operation(summary = "Unsave a job", description = "Removes the specified job from the authenticated job seeker's saved jobs.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Job unsaved"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<String> unsaveJob(@PathVariable Long jobId,
                                             Authentication authentication) {
@@ -132,6 +157,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/saved-jobs/jobseeker", version = "1.0")
+    @Operation(summary = "List saved jobs", description = "Returns jobs saved by the authenticated job seeker.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Saved jobs returned"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<List<JobDto>> getSavedJobs(Authentication authentication) {
         String userEmail = authentication.getName();
@@ -140,6 +167,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/job-applications/jobseeker", version = "1.0")
+    @Operation(summary = "Apply for a job", description = "Submits a job application for the authenticated job seeker using the supplied application details.")
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Application submitted"), @ApiResponse(responseCode = "400", description = "Invalid application request"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<JobApplicationDto> applyForJob(
             @RequestBody @Valid ApplyJobRequestDto applyJobRequestDto, Authentication authentication) {
@@ -149,6 +178,8 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/job-applications/{jobId}/jobseeker", version = "1.0")
+    @Operation(summary = "Withdraw a job application", description = "Withdraws the authenticated job seeker's application for the specified job.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Application withdrawn"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<String> withdrawApplication(@PathVariable Long jobId,
                                                       Authentication authentication) {
@@ -158,6 +189,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/job-applications/jobseeker", version = "1.0")
+    @Operation(summary = "List job seeker applications", description = "Returns job applications submitted by the authenticated job seeker.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Applications returned"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "JOB_SEEKER role required")})
     @PreAuthorize("hasRole('JOB_SEEKER')")
     public ResponseEntity<List<JobApplicationDto>> getJobSeekerApplications(Authentication authentication) {
         String userEmail = authentication.getName();

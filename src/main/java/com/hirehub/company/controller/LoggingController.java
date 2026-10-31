@@ -6,6 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.hirehub.dto.ErrorResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/logging")
@@ -15,6 +21,8 @@ public class LoggingController {
     // private static final Logger LOGGER = LoggerFactory.getLogger(LoggingController.class);
 
     @GetMapping(path = "/public", version = "1.0")
+    @Operation(summary = "Test application logging", description = "Emits sample log messages at each configured log level and returns a confirmation.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Logging test completed"), @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))})
     public ResponseEntity<String> testLogging() {
         log.trace("🔍 TRACE: This is a very detailed trace log. Used for tracking execution flow.");
         log.debug("🐞 DEBUG: This is a debug message. Used for debugging.");
