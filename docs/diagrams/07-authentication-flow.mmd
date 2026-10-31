@@ -1,0 +1,25 @@
+%%{init: {"sequence": {"wrap": false, "width": 150, "actorMargin": 50, "messageMargin": 40}}}%%
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant A as AuthController
+    participant V as Validation aspect
+    participant P as Auth provider
+    participant JS as JwtService
+    participant DB as MySQL
+    U->>A: GET /api/csrf-token/public
+    A-->>U: CSRF token and cookie
+    Note over U,A: Send X-XSRF-TOKEN on every POST
+    U->>A: POST /api/auth/register/public
+    A->>V: Before advice
+    V->>V: Breached-password and duplicate checks
+    V-->>A: OK, or 400 with errors
+    A->>DB: Save user, BCrypt hash, role JOB_SEEKER
+    U->>A: POST /api/auth/login/public
+    A->>P: Authenticate email and password
+    P->>DB: Load user by email
+    P->>P: Compare with BCrypt hash
+    P-->>A: Authenticated with authorities
+    A->>JS: Generate token
+    JS-->>A: Signed JWT
+    A-->>U: 200 with message, user, jwtToken

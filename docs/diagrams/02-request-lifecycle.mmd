@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor C as Client
+    participant F as Security filter chain
+    participant J as JWT filter
+    participant Ctl as Controller
+    participant S as Service
+    participant R as Repository
+    participant DB as MySQL
+    C->>F: Request with Bearer JWT
+    F->>J: CORS and CSRF pass
+    J->>J: Validate JWT, set SecurityContext
+    J->>Ctl: Forward
+    Ctl->>Ctl: Role check
+    Ctl->>S: Call with caller email
+    S->>R: Query scoped to caller company
+    R->>DB: SQL
+    DB-->>R: Rows
+    R-->>S: Entities
+    S-->>Ctl: DTOs
+    Ctl-->>C: JSON response

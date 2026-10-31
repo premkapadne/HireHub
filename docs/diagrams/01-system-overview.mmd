@@ -1,0 +1,11 @@
+flowchart TB
+    client(["Client<br/>Postman or frontend"]) -->|"HTTP + JWT"| api
+    subgraph api["HireHub API · Spring Boot 4"]
+        direction TB
+        sec["Spring Security<br/>CORS · CSRF · JWT filter"] --> ctl["Controllers"]
+        ctl --> svc["Services"]
+        svc --> repo["Spring Data JPA<br/>repositories"]
+        svc -.-> cache[("Caffeine<br/>cache")]
+    end
+    repo --> db[("MySQL 8<br/>schema by Flyway")]
+    api -.->|"OTLP: traces, metrics, logs"| graf["Grafana LGTM"]

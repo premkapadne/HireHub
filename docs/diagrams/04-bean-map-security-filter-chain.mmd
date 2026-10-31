@@ -1,0 +1,6 @@
+flowchart TB
+    PathsConfig["PathsConfig<br/>list of public paths"] --> SFC
+    CorsProperties["CorsProperties<br/>app.cors.*"] --> CORSB["CorsConfigurationSource"]
+    CORSB --> SFC
+    JwtService --> JWTF["JwtTokenValidatorFilter<br/>created inside the chain"]
+    JWTF --> SFC["SecurityFilterChain<br/>JobPortalSecurityConfig"]

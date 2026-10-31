@@ -1,0 +1,7 @@
+flowchart TB
+    AM["AuthenticationManager"] --> PROV{"AuthenticationProvider<br/>chosen by profile"}
+    PROV -->|"default and prod"| P1["JobPortalUsernamePwdAuthenticationProvider<br/>checks the password"]
+    PROV -->|"qa"| P2["JobPortalNonProdUsernamePwdAuthenticationProvider<br/>email only"]
+    P1 --> PE["PasswordEncoder<br/>BCrypt"]
+    P1 --> UR["HireHubUserRepository"]
+    P2 --> UR

@@ -1,0 +1,50 @@
+flowchart LR
+    subgraph WEB["Web layer · RestController"]
+        ContactController
+        CompanyController
+        AuthController
+        UserController
+        JobController
+        CsrfController
+    end
+    subgraph SVC["Service layer · Service"]
+        ContactServiceImpl
+        CompanyServiceImpl
+        UserServiceImpl
+        JobServiceImpl
+    end
+    subgraph REPO["Data layer · Spring Data JPA repositories"]
+        ContactRepository
+        CompanyRepository
+        HireHubUserRepository
+        RoleRepository
+        ProfileRepository
+        JobRepository
+        JobApplicationRepository
+    end
+
+    ContactController --> ContactServiceImpl
+    CompanyController --> CompanyServiceImpl
+    UserController --> UserServiceImpl
+    JobController --> JobServiceImpl
+    AuthController --> HireHubUserRepository
+    AuthController --> RoleRepository
+
+    ContactServiceImpl --> ContactRepository
+    CompanyServiceImpl --> CompanyRepository
+    UserServiceImpl --> HireHubUserRepository
+    UserServiceImpl --> RoleRepository
+    UserServiceImpl --> CompanyRepository
+    UserServiceImpl --> ProfileRepository
+    UserServiceImpl --> JobRepository
+    UserServiceImpl --> JobApplicationRepository
+    JobServiceImpl --> JobRepository
+    JobServiceImpl --> HireHubUserRepository
+    JobServiceImpl --> JobApplicationRepository
+
+    classDef controller fill:#dbeafe,stroke:#3b82f6,color:#0f172a
+    classDef service fill:#dcfce7,stroke:#22c55e,color:#0f172a
+    classDef repo fill:#ffedd5,stroke:#f97316,color:#0f172a
+    class ContactController,CompanyController,AuthController,UserController,JobController,CsrfController controller
+    class ContactServiceImpl,CompanyServiceImpl,UserServiceImpl,JobServiceImpl service
+    class ContactRepository,CompanyRepository,HireHubUserRepository,RoleRepository,ProfileRepository,JobRepository,JobApplicationRepository repo

@@ -1,0 +1,97 @@
+erDiagram
+    companies ||--o{ jobs : "posts"
+    jobs ||--o{ job_applications : "receives"
+    users ||--o{ job_applications : "submits"
+    jobs ||--o{ saved_jobs : "saved as"
+    users ||--o{ saved_jobs : "bookmarks"
+    companies |o--o{ users : "employs"
+    roles ||--o{ users : "assigned to"
+    users ||--o| profiles : "has"
+
+    companies {
+        BIGINT id PK
+        VARCHAR name UK
+        VARCHAR industry
+        VARCHAR size
+        DECIMAL rating
+        VARCHAR locations
+        INT founded
+        LONGTEXT description
+        INT employees
+        VARCHAR website
+        VARCHAR logo
+    }
+    jobs {
+        BIGINT id PK
+        BIGINT company_id FK
+        VARCHAR title
+        VARCHAR location
+        VARCHAR work_type
+        VARCHAR job_type
+        VARCHAR category
+        VARCHAR experience_level
+        DECIMAL salary_min
+        DECIMAL salary_max
+        VARCHAR salary_currency
+        VARCHAR salary_period
+        LONGTEXT description
+        LONGTEXT requirements
+        LONGTEXT benefits
+        TIMESTAMP posted_date
+        TIMESTAMP application_deadline
+        INT applications_count
+        TINYINT featured
+        TINYINT urgent
+        TINYINT remote
+        VARCHAR status
+    }
+    users {
+        BIGINT id PK
+        VARCHAR name
+        VARCHAR email UK
+        VARCHAR password_hash
+        VARCHAR mobile_number UK
+        BIGINT role_id FK
+        BIGINT company_id FK
+    }
+    roles {
+        BIGINT id PK
+        VARCHAR name UK
+    }
+    profiles {
+        BIGINT id PK
+        BIGINT user_id FK
+        VARCHAR job_title
+        VARCHAR location
+        VARCHAR experience_level
+        LONGTEXT professional_bio
+        VARCHAR portfolio_website
+        MEDIUMBLOB profile_picture
+        VARCHAR profile_picture_name
+        VARCHAR profile_picture_type
+        MEDIUMBLOB resume
+        VARCHAR resume_name
+        VARCHAR resume_type
+    }
+    job_applications {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT job_id FK
+        TIMESTAMP applied_at
+        VARCHAR status
+        LONGTEXT cover_letter
+        LONGTEXT notes
+    }
+    saved_jobs {
+        BIGINT user_id PK, FK
+        BIGINT job_id PK, FK
+    }
+    contacts {
+        BIGINT id PK
+        VARCHAR name
+        VARCHAR email
+        VARCHAR subject
+        LONGTEXT message
+        VARCHAR user_type
+        VARCHAR status
+    }

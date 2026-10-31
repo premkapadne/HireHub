@@ -1,0 +1,18 @@
+flowchart LR
+    subgraph AOP["Aspects"]
+        LoggingAndPerformanceAspect
+        ExceptionAuditAspect
+        LoginSuccessAuditAspect
+        RegisterValidationAspect
+    end
+    RegisterValidationAspect --> CPC2["CompromisedPasswordChecker"]
+    RegisterValidationAspect --> UR2["HireHubUserRepository"]
+    subgraph OTHER["Supporting beans"]
+        GEH["GlobalExceptionHandler<br/>RestControllerAdvice"]
+        AUD["AuditorAwareImpl<br/>createdBy and updatedBy"]
+        CACHE["CaffeineCacheConfig<br/>jobs, companies, roles"]
+        WEBC["WebConfig<br/>/api prefix, API versioning"]
+        OTELI["OpenTelemetryAppenderInitializer"]
+    end
+    GEH --> Tracer["Micrometer Tracer"]
+    OTELI --> OTel["OpenTelemetry"]
